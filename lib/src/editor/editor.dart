@@ -332,13 +332,15 @@ class QuillEditorState extends State<QuillEditor>
 
     final editor = selectionEnabled
         ? _selectionGestureDetectorBuilder.build(
-            behavior: HitTestBehavior.translucent,
+            behavior: HitTestBehavior.opaque,
             detectWordBoundary: config.detectWordBoundary,
             child: child,
             dragOffsetNotifier: dragOffsetNotifier,
             quillMagnifierBuilder: config.quillMagnifierBuilder,
           )
         : child;
+
+    final protectedEditor = SelectionContainer.disabled(child: editor);
 
     if (kIsWeb) {
       // Intercept RawKeyEvent on Web to prevent it from propagating to parents
@@ -350,11 +352,11 @@ class QuillEditorState extends State<QuillEditor>
         focusNode: FocusNode(
           onKeyEvent: (node, event) => KeyEventResult.skipRemainingHandlers,
         ),
-        child: editor,
+        child: protectedEditor,
       );
     }
 
-    return editor;
+    return protectedEditor;
   }
 
   EmbedBuilder _getEmbedBuilder(Embed node) {
